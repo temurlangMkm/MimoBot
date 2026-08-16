@@ -43,5 +43,10 @@ public class ScheduleEntity {
     @Column(name = "period", nullable = false)
     private Integer period;
 
+    @NotNull
+    @Column(name = "sub_group", nullable = false)
+    private Integer subGroup;
+
+
 
 }

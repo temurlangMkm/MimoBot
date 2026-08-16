@@ -1,17 +1,19 @@
 package Mimo.schedule;
 import jakarta.validation.constraints.Null;
 
+import java.time.DayOfWeek;
+
 
 public record Schedule(
-        @Null
         Long id,
-        Long group_id,
-        Long subject_id,
-        Long teacher_id,
-        Long room_id,
-        int period
-){
-
+        DayOfWeek dayOfWeek,
+        String group,
+        String subject,
+        String teacher,
+        String room,
+        int period,
+        int subGroup
+) {
 }
 
 
