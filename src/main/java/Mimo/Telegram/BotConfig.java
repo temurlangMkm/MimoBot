@@ -1,4 +1,4 @@
-package Mimo.telegram;
+package Mimo.Telegram;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

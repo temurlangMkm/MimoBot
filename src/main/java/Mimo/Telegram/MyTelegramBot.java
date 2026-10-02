@@ -1,6 +1,7 @@
-package Mimo.telegram;
+package Mimo.Telegram;
 
 
+import Mimo.Telegram.Handlers.ChatHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -13,11 +14,13 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class MyTelegramBot extends TelegramLongPollingBot {
 
     private final String botUsername;
+    private final ChatHandler chatHandler;
 
     public MyTelegramBot(@Value("${bot.token}") String botToken,
-                             @Value("${bot.name}") String botUsername) {
+                         @Value("${bot.name}") String botUsername, ChatHandler chatHandler) {
         super(botToken);
         this.botUsername = botUsername;
+        this.chatHandler = chatHandler;
     }
 
 
@@ -35,13 +38,25 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         // Check if the update has a message and the message has text
         if (update.hasMessage() && update.getMessage().hasText()) {
+
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
 
-            // Echo the received text back to the user;
+            String sendMessage = chatHandler.handle(messageText, chatId);
+
+            if(!sendMessage.isBlank()){
+                SendMessage(chatId, sendMessage);
+            }
+
+        }
+
+    }
+
+    public void SendMessage(long chatId, String messageText){
+        if(!messageText.isEmpty()){
             SendMessage message = SendMessage.builder()
                     .chatId(chatId)
-                    .text("You said: " + messageText)
+                    .text(messageText)
                     .build();
 
             try {
@@ -50,5 +65,8 @@ public class MyTelegramBot extends TelegramLongPollingBot {
                 e.printStackTrace();
             }
         }
+
     }
+
+
 }
