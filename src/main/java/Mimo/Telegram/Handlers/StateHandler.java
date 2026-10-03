@@ -21,7 +21,7 @@ public class StateHandler {
     public String handle(String message, Long  id, State state){
 
         return switch (state) {
-            case CHOICE_GROUP -> groupService.saveGroup(message);
+            case CHOICE_GROUP -> userService.saveGroup(id, message);
             case UNREGISTRED -> userService.registration(id);
             default -> "Error. Your message could not be processed at this moment.";
         };

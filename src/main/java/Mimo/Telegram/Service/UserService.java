@@ -1,5 +1,6 @@
 package Mimo.Telegram.Service;
 
+import Mimo.Schedule.Service.GroupService;
 import Mimo.Telegram.Entity.UserEntity;
 import Mimo.Telegram.Language;
 import Mimo.Telegram.Repository.UsersRepository;
@@ -11,10 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
 
-    public UsersRepository userRepo;
+    private final UsersRepository userRepo;
+    private final GroupService  groupService;
 
-    public UserService(UsersRepository userRepo) {
+    public UserService(UsersRepository userRepo, GroupService groupService) {
         this.userRepo = userRepo;
+        this.groupService = groupService;
     }
 
     public State getState(Long id){
@@ -42,6 +45,22 @@ public class UserService {
         return "Siz yangi siz.";
 
     }
+
+    public String saveGroup(Long id, String text){
+
+        boolean flag = groupService.saveGroup(text);
+
+        if(flag){
+            UserEntity user = userRepo.findByTgId(id);
+            user.setState(State.NONE);
+            userRepo.save(user);
+            return "Group Saved";
+        }else{
+            return "Invalid group name. Try again";
+        }
+    }
+
+
 
 
 }

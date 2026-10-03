@@ -2,6 +2,7 @@ package Mimo.Schedule.Service;
 
 import Mimo.Schedule.Entity.GroupEntity;
 import Mimo.Schedule.Repository.GroupRepository;
+import Mimo.Telegram.Service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
@@ -9,7 +10,7 @@ import java.util.Locale;
 @Service
 public class GroupService {
 
-    GroupRepository groupRepository;
+    private final GroupRepository groupRepository;
 
     public GroupService(GroupRepository groupRepository) {
         this.groupRepository = groupRepository;
@@ -17,23 +18,23 @@ public class GroupService {
 
 
 
-    public String saveGroup(String text){
+    public boolean saveGroup(String text){
 
         String groupName = normalizeGroup(text);
 
         if(groupRepository.existsByName(groupName)){
-            return "This group already exists.";
+            return true;
         }
 
         if(groupName.equals("Invalid group name")){
-            return "Invalid group name";
+            return false;
         }
 
         GroupEntity groupEntity = new GroupEntity();
         groupEntity.setName(groupName);
         groupRepository.save(groupEntity);
 
-        return "Group saved.";
+        return true;
     }
 
     public String normalizeGroup(String text) {
