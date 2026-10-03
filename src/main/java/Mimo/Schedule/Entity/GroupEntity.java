@@ -1,4 +1,4 @@
-package Mimo.Basic.Entity;
+package Mimo.Schedule.Entity;
 
 
 import jakarta.persistence.*;

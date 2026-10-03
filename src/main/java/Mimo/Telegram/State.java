@@ -2,5 +2,5 @@ package Mimo.Telegram;
 
 public enum State {
     NONE,
-    CHOICE_GROUP
+    UNREGISTRED, CHOICE_GROUP
 }

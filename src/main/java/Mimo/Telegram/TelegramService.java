@@ -1,8 +1,8 @@
 package Mimo.Telegram;
 
 
-import Mimo.Basic.Entity.GroupEntity;
-import Mimo.Basic.Repositorys.GroupRepository;
+import Mimo.Schedule.Entity.GroupEntity;
+import Mimo.Schedule.Repository.GroupRepository;
 import Mimo.Telegram.Entity.UserEntity;
 import Mimo.Telegram.Repository.UsersRepository;
 import org.springframework.stereotype.Service;

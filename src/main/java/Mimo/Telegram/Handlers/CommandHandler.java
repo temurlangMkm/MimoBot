@@ -1,9 +1,9 @@
 package Mimo.Telegram.Handlers;
 
 import Mimo.Telegram.TelegramService;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class CommandHandler {
 
     private final TelegramService service;
