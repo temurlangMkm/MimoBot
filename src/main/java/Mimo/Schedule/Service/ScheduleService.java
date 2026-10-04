@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
+import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,19 +28,34 @@ public class ScheduleService {
     private final SubjectRepository subjectRepository;
     private final TeacherRepository teacherRepository;
     private final RoomRepository roomRepository;
+    private final ScheduleMapper scheduleMapper;
 
-
-    public ScheduleService(ObjectMapper scheduleMapper, ScheduleRepository scheduleRepository, GroupService groupService, SubjectRepository subjectRepository, TeacherRepository teacherRepository, RoomRepository roomRepository) {
-        this.mapper = scheduleMapper;
+    public ScheduleService(ObjectMapper mapper, ScheduleRepository scheduleRepository, GroupService groupService, SubjectRepository subjectRepository, TeacherRepository teacherRepository, RoomRepository roomRepository, ScheduleMapper schMapper) {
+        this.mapper = mapper;
         this.scheduleRepository = scheduleRepository;
         this.groupService = groupService;
         this.subjectRepository = subjectRepository;
         this.teacherRepository = teacherRepository;
         this.roomRepository = roomRepository;
+        scheduleMapper = schMapper;
+    }
+
+    public List<Schedule> getScheduleForWeek(Long groupId){
+        return scheduleMapper.mapToSchedules(scheduleRepository.findWeekSchedule(groupId));
+    }
+
+    public List<Schedule> getScheduleForDay(Long groupId,  DayOfWeek dayOfWeek){
+        return scheduleMapper.mapToSchedules(scheduleRepository.findDaySchedule(groupId, dayOfWeek.name()));
+    }
+
+    @Transactional
+    public void deleteGroupSchedule(Long groupId){
+        scheduleRepository.deleteAllByGroupId(groupId);
     }
 
     @Transactional
     public String setSchedule(String message, String groupName) {
+
 
         List<Schedule> schedules;
 
@@ -56,6 +72,8 @@ public class ScheduleService {
         Map<String, Long> teachersMap = loadTeachers(schedules);
 
         Long groupId = groupService.getIdByName(groupName);
+
+        deleteGroupSchedule(groupId); //delete old schedule
 
         List<ScheduleEntity> scheduleEntities = buildScheduleEntities(
                 schedules,

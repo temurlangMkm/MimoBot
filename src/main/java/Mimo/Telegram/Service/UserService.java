@@ -1,5 +1,6 @@
 package Mimo.Telegram.Service;
 
+import Mimo.Schedule.DTO.Schedule;
 import Mimo.Schedule.Service.GroupService;
 import Mimo.Schedule.Service.ScheduleService;
 import Mimo.Telegram.Entity.UserEntity;
@@ -8,6 +9,9 @@ import Mimo.Telegram.Repository.UsersRepository;
 import Mimo.Telegram.State;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.DayOfWeek;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -121,4 +125,105 @@ public class UserService {
         return "Send Your Schedule in format JSON";
     }
 
+    public String getWeeKSchedule(Long id) {
+
+        UserEntity user = userRepo.findByTgId(id);
+
+        if(user == null || user.getGroupID()==null){
+            return registration(id);
+        }
+
+        Long groupId = user.getGroupID();
+        List<Schedule> scheduleList =
+                scheduleService.getScheduleForWeek(groupId);
+
+        if (scheduleList.isEmpty()) {
+            return "На этой неделе занятий нет.";
+        }
+
+        StringBuilder text = new StringBuilder();
+
+        DayOfWeek currentDay = null;
+
+        for (Schedule schedule : scheduleList) {
+
+            if (currentDay != schedule.getDayOfWeek()) {
+                currentDay = schedule.getDayOfWeek();
+
+                text.append("📅")
+                        .append("\n")
+                        .append(getDayName(currentDay))
+                        .append("\n\n");
+            }
+
+            text.append(schedule.getStartTime())
+                    .append(" — ")
+                    .append(schedule.getSubject())
+                    .append("\n");
+
+            text.append(schedule.getType())
+                    .append(" · ")
+                    .append(schedule.getRoom())
+                    .append("\n");
+
+            text.append(schedule.getTeacher())
+                    .append("\n\n");
+        }
+
+        return text.toString().trim();
+    }
+
+    public String getDaySchedule(DayOfWeek dayOfWeek, Long id) {
+
+        UserEntity user = userRepo.findByTgId(id);
+
+        if(user == null || user.getGroupID()==null){
+            return registration(id);
+        }
+
+        Long groupId = user.getGroupID();
+
+        List<Schedule> scheduleList =
+                scheduleService.getScheduleForDay(groupId, dayOfWeek);
+
+        if (scheduleList.isEmpty()) {
+            return "На этот день занятий нет.";
+        }
+
+        StringBuilder text = new StringBuilder();
+
+        text.append("📅")
+                .append(getDayName(dayOfWeek))
+                .append("\n\n");
+
+        for (Schedule schedule : scheduleList) {
+
+            text.append(schedule.getStartTime())
+                    .append(" — ")
+                    .append(schedule.getSubject())
+                    .append("\n");
+
+            text.append(schedule.getType())
+                    .append(" · ")
+                    .append(schedule.getRoom())
+                    .append("\n");
+
+            text.append(schedule.getTeacher())
+                    .append("\n\n");
+        }
+
+        return text.toString().trim();
+    }
+
+    private String getDayName(DayOfWeek dayOfWeek) {
+        return switch (dayOfWeek) {
+            case MONDAY -> "Понедельник";
+            case TUESDAY -> "Вторник";
+            case WEDNESDAY -> "Среда";
+            case THURSDAY -> "Четверг";
+            case FRIDAY -> "Пятница";
+            case SATURDAY -> "Суббота";
+            case SUNDAY -> "Воскресенье";
+        };
+    }
 }
