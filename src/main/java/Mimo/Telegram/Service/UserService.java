@@ -1,6 +1,7 @@
 package Mimo.Telegram.Service;
 
 import Mimo.Schedule.Service.GroupService;
+import Mimo.Schedule.Service.ScheduleService;
 import Mimo.Telegram.Entity.UserEntity;
 import Mimo.Telegram.Language;
 import Mimo.Telegram.Repository.UsersRepository;
@@ -14,17 +15,32 @@ public class UserService {
 
     private final UsersRepository userRepo;
     private final GroupService  groupService;
+    private final ScheduleService scheduleService;
 
-    public UserService(UsersRepository userRepo, GroupService groupService) {
+    public UserService(UsersRepository userRepo, GroupService groupService, ScheduleService scheduleService) {
         this.userRepo = userRepo;
         this.groupService = groupService;
+        this.scheduleService = scheduleService;
     }
 
-    public State getState(Long id){
+    public String infoAboutUser(Long id){ //forTest
+
         UserEntity user = userRepo.findByTgId(id);
 
         if(user == null){
-            return State.UNREGISTRED;
+            return registration(id);
+        }
+
+        return "group: "+ groupService.getNameByID(user.getGroupID())+"\nState: "+user.getState();
+
+    }
+
+    public State getState(Long id){
+
+        UserEntity user = userRepo.findByTgId(id);
+
+        if(user == null){
+            return State.UNREGISTERED;
         }
 
         return user.getState();
@@ -48,11 +64,12 @@ public class UserService {
 
     public String saveGroup(Long id, String text){
 
-        boolean flag = groupService.saveGroup(text);
+        Long groupId = groupService.saveGroup(text);
 
-        if(flag){
+        if(groupId>0){
             UserEntity user = userRepo.findByTgId(id);
             user.setState(State.NONE);
+            user.setGroupID(groupId);
             userRepo.save(user);
             return "Group Saved";
         }else{
@@ -61,7 +78,14 @@ public class UserService {
     }
 
     public String setSchedule(String message, Long chatId) {
-        return "TODO";
+
+        UserEntity user = userRepo.findByTgId(chatId);
+        String groupName = groupService.getNameById(user.getGroupID());
+        String text =  scheduleService.setSchedule(message, groupName);
+        user.setState(State.NONE);
+        userRepo.save(user);
+
+        return text;
     }
 
     public String setNotify(String message, Long chatId) {
@@ -84,4 +108,17 @@ public class UserService {
         if(user==null) return registration(chatId);
         return "TODO";
     }
+
+    public String set (Long id){
+        UserEntity user = userRepo.findByTgId(id);
+
+        if(user == null){
+            return registration(id);
+        }
+
+        user.setState(State.SEND_SCHEDULE);
+        userRepo.save(user);
+        return "Send Your Schedule in format JSON";
+    }
+
 }

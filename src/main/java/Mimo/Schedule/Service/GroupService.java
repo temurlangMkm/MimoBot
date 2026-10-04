@@ -2,7 +2,6 @@ package Mimo.Schedule.Service;
 
 import Mimo.Schedule.Entity.GroupEntity;
 import Mimo.Schedule.Repository.GroupRepository;
-import Mimo.Telegram.Service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
@@ -18,23 +17,24 @@ public class GroupService {
 
 
 
-    public boolean saveGroup(String text){
+    public Long saveGroup(String text){
 
         String groupName = normalizeGroup(text);
 
+        Long id;
+
         if(groupRepository.existsByName(groupName)){
-            return true;
+            return groupRepository.findByName(groupName).getId();
         }
 
         if(groupName.equals("Invalid group name")){
-            return false;
+            return -1L;
         }
 
         GroupEntity groupEntity = new GroupEntity();
         groupEntity.setName(groupName);
-        groupRepository.save(groupEntity);
 
-        return true;
+        return  groupRepository.save(groupEntity).getId();
     }
 
     public String normalizeGroup(String text) {
@@ -63,5 +63,16 @@ public class GroupService {
         }
 
         return group.getName();
+    }
+
+    public Long getIdByName(String name){
+        return groupRepository.findByName(name).getId();
+    }
+
+    public String getNameById(Long groupId) {
+
+        GroupEntity group = groupRepository.findById(groupId).orElse(null);
+
+        return group==null ? "null":group.getName();
     }
 }

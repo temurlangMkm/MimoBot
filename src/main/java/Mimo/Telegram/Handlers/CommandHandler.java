@@ -20,10 +20,11 @@ public class CommandHandler {
 
         return switch (command) {
             case "/get" -> userService.getSchedule(message, chatId);
-            case "/set" -> userService.setSchedule(message, chatId);
+            case "/set" -> userService.set(chatId);
             case "/lang" -> userService.setLang(message, chatId);
             case "/notify" -> userService.setNotify(message, chatId);
             case "/forgetMe" -> userService.deleteUser(chatId);
+            case "/me" -> userService.infoAboutUser(chatId);
             default -> "Bunday buyruq mavjud emas.";
         };
     }

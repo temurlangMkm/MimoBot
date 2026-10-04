@@ -2,5 +2,7 @@ package Mimo.Telegram;
 
 public enum State {
     NONE,
-    UNREGISTRED, CHOICE_GROUP
+    UNREGISTERED,
+    CHOICE_GROUP,
+    SEND_SCHEDULE
 }

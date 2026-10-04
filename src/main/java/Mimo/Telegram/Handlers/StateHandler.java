@@ -17,7 +17,8 @@ public class StateHandler {
 
         return switch (state) {
             case CHOICE_GROUP -> userService.saveGroup(id, message);
-            case UNREGISTRED -> userService.registration(id);
+            case UNREGISTERED -> userService.registration(id);
+            case SEND_SCHEDULE -> userService.setSchedule(message, id);
             default -> "Error. Your message could not be processed at this moment.";
         };
 
