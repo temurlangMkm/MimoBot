@@ -42,7 +42,7 @@ public class UserService {
         userToSave.setState(State.CHOICE_GROUP);
         userRepo.save(userToSave);
 
-        return "Siz yangi siz.";
+        return "You are new in this bot, please send your group";
 
     }
 
@@ -60,7 +60,28 @@ public class UserService {
         }
     }
 
+    public String setSchedule(String message, Long chatId) {
+        return "TODO";
+    }
+
+    public String setNotify(String message, Long chatId) {
+        return "TODO";
+    }
+
+    public String setLang(String message, Long chatId) {
+        return "TODO";
+    }
+
+    @Transactional
+    public String deleteUser(Long chatId) {
+        userRepo.deleteByTgId(chatId);
+        return "User "+chatId+" deleted.";
+    }
 
 
-
+    public String getSchedule(String message, Long chatId) {
+        UserEntity user = userRepo.findByTgId(chatId);
+        if(user==null) return registration(chatId);
+        return "TODO";
+    }
 }

@@ -1,15 +1,15 @@
 package Mimo.Telegram.Handlers;
 
-import Mimo.Telegram.TelegramService;
+import Mimo.Telegram.Service.UserService;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CommandHandler {
 
-    private final TelegramService service;
+    private final UserService userService;
 
-    public CommandHandler(TelegramService service) {
-        this.service = service;
+    public CommandHandler( UserService userService) {
+        this.userService = userService;
     }
 
 
@@ -19,11 +19,11 @@ public class CommandHandler {
         String command = message.split(" ")[0];
 
         return switch (command) {
-            case "/get" -> service.getSchedule(message, chatId);
-            case "/set" -> service.setSchedule(message, chatId);
-            case "/lang" -> service.setLang(message, chatId);
-            case "/notify" -> service.setNotify(message, chatId);
-            case "/forgetMe" -> service.deleteUser(chatId);
+            case "/get" -> userService.getSchedule(message, chatId);
+            case "/set" -> userService.setSchedule(message, chatId);
+            case "/lang" -> userService.setLang(message, chatId);
+            case "/notify" -> userService.setNotify(message, chatId);
+            case "/forgetMe" -> userService.deleteUser(chatId);
             default -> "Bunday buyruq mavjud emas.";
         };
     }

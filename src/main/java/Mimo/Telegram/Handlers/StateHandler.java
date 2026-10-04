@@ -1,20 +1,15 @@
 package Mimo.Telegram.Handlers;
 
-import Mimo.Schedule.Service.GroupService;
 import Mimo.Telegram.Service.UserService;
 import Mimo.Telegram.State;
-import Mimo.Telegram.TelegramService;
-import org.apache.catalina.User;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StateHandler {
 
-    private final GroupService groupService;
     private final UserService userService;
 
-    public StateHandler(GroupService groupService, UserService userService) {
-        this.groupService = groupService;
+    public StateHandler(UserService userService) {
         this.userService = userService;
     }
 
