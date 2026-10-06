@@ -58,7 +58,6 @@ public class MyTelegramBot extends TelegramLongPollingBot {
                     .chatId(chatId)
                     .text(messageText)
                     .build();
-
             try {
                 execute(message);
             } catch (TelegramApiException e) {

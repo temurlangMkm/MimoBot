@@ -16,7 +16,13 @@ import java.util.List;
 @Service
 public class UserService {
 
-
+    /*TODO Divide the service into:
+        RegistrationService
+        CommandsService
+        FlowService
+        ChatService
+        UserService
+    */
     private final UsersRepository userRepo;
     private final GroupService  groupService;
     private final ScheduleService scheduleService;
@@ -27,7 +33,7 @@ public class UserService {
         this.scheduleService = scheduleService;
     }
 
-    public String infoAboutUser(Long id){ //forTest
+    public String infoAboutUser(Long id){ //TODO add user activities, Points in games (TODO for future: add mini games)
 
         UserEntity user = userRepo.findByTgId(id);
 
@@ -62,7 +68,7 @@ public class UserService {
         userToSave.setState(State.CHOICE_GROUP);
         userRepo.save(userToSave);
 
-        return "You are new in this bot, please send your group";
+        return "You are new in this bot, please send your group.";
 
     }
 
@@ -84,33 +90,26 @@ public class UserService {
     public String setSchedule(String message, Long chatId) {
 
         UserEntity user = userRepo.findByTgId(chatId);
+
         String groupName = groupService.getNameById(user.getGroupID());
+
         String text =  scheduleService.setSchedule(message, groupName);
+
+        if(text.startsWith("ERROR")){
+            System.out.println(text); //TODO add logger
+            return "invalid JSON";
+        }
+
         user.setState(State.NONE);
         userRepo.save(user);
 
         return text;
     }
 
-    public String setNotify(String message, Long chatId) {
-        return "TODO";
-    }
-
-    public String setLang(String message, Long chatId) {
-        return "TODO";
-    }
-
     @Transactional
     public String deleteUser(Long chatId) {
         userRepo.deleteByTgId(chatId);
         return "User "+chatId+" deleted.";
-    }
-
-
-    public String getSchedule(String message, Long chatId) {
-        UserEntity user = userRepo.findByTgId(chatId);
-        if(user==null) return registration(chatId);
-        return "TODO";
     }
 
     public String set (Long id){
@@ -151,7 +150,6 @@ public class UserService {
                 currentDay = schedule.getDayOfWeek();
 
                 text.append("📅")
-                        .append("\n")
                         .append(getDayName(currentDay))
                         .append("\n\n");
             }

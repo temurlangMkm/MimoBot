@@ -82,7 +82,7 @@ public class ScheduleMapper {
 
         return entities.stream()
                 .map(entity -> new Schedule(
-                        DayOfWeek.valueOf(entity.getDayOfWeek()),
+                        entity.getDayOfWeek(),
                         groups.get(entity.getGroupId()).getName(),
                         subjects.get(entity.getSubjectId()).getName(),
                         entity.getType(),

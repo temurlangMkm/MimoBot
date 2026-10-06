@@ -18,13 +18,11 @@ public class CommandHandler {
 
     public String handle(String message, Long chatId) {
 
-        String[] command = message.split(" ");
+        String[] command = message.split("\\s+");
 
         return switch (command[0]) {
             case "/get" -> getHandle(message, chatId);
             case "/set" -> userService.set(chatId);
-            case "/lang" -> userService.setLang(message, chatId);
-            case "/notify" -> userService.setNotify(message, chatId);
             case "/forgetMe" -> userService.deleteUser(chatId);
             case "/me" -> userService.infoAboutUser(chatId);
             default -> "Bunday buyruq mavjud emas.";

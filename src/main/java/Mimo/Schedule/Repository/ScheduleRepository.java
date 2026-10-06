@@ -14,7 +14,17 @@ public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Long> 
         SELECT s
         FROM ScheduleEntity s
         WHERE s.groupId = :groupId
-            ORDER BY s.dayOfWeek, s.startTime
+            ORDER BY
+                CASE s.dayOfWeek
+                    WHEN 'MONDAY' THEN 1
+                    WHEN 'TUESDAY' THEN 2
+                    WHEN 'WEDNESDAY' THEN 3
+                    WHEN 'THURSDAY' THEN 4
+                    WHEN 'FRIDAY' THEN 5
+                    WHEN 'SATURDAY' THEN 6
+                    WHEN 'SUNDAY' THEN 7
+                END,
+                    s.startTime
     """)
     List<ScheduleEntity> findWeekSchedule(Long groupId);
 
@@ -27,7 +37,7 @@ public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Long> 
     """)
     List<ScheduleEntity> findDaySchedule(
             Long groupId,
-            String dayOfWeek
+            DayOfWeek dayOfWeek
     );
 
 }

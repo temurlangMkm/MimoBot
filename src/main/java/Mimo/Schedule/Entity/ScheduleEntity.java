@@ -32,15 +32,16 @@ public class ScheduleEntity {
     @Column(name = "type")
     private String type;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "day_of_week")
-    private String dayOfWeek;
+    private DayOfWeek dayOfWeek;
 
     @Column(name =  "start_time")
     private LocalTime startTime;
 
     public ScheduleEntity(){}
 
-    public ScheduleEntity(Long id, Long groupId, Long subjectId, Long teacherId, Long roomId, String type, String dayOfWeek, LocalTime startTime) {
+    public ScheduleEntity(Long id, Long groupId, Long subjectId, Long teacherId, Long roomId, String type, DayOfWeek dayOfWeek, LocalTime startTime) {
         this.id = id;
         this.groupId = groupId;
         this.subjectId = subjectId;

@@ -15,7 +15,10 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import java.time.DayOfWeek;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,7 +48,7 @@ public class ScheduleService {
     }
 
     public List<Schedule> getScheduleForDay(Long groupId,  DayOfWeek dayOfWeek){
-        return scheduleMapper.mapToSchedules(scheduleRepository.findDaySchedule(groupId, dayOfWeek.name()));
+        return scheduleMapper.mapToSchedules(scheduleRepository.findDaySchedule(groupId, dayOfWeek));
     }
 
     @Transactional
@@ -54,7 +57,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public String setSchedule(String message, String groupName) {
+    public String setSchedule(String message, String groupName) { //TODO исправит обработку ошибок.
 
 
         List<Schedule> schedules;
@@ -62,7 +65,7 @@ public class ScheduleService {
         try {
             schedules = parseSchedules(message);
         } catch (JacksonException e) {
-            return e.getLocalizedMessage();
+            return "EROR: "+e.getLocalizedMessage();
         }
 
         prepareSchedules(schedules, groupName);
@@ -88,7 +91,7 @@ public class ScheduleService {
         return schedules.toString();
     }
 
-    private List<Schedule> parseSchedules(String message) throws JacksonException {
+    private List<Schedule> parseSchedules(String message) throws JacksonException { //TODO refactoring
 
         return mapper.readValue(
                 message,
@@ -127,7 +130,6 @@ public class ScheduleService {
                 entity.setName(name);
 
                 Long id = subjectRepository.save(entity).getId();
-                subjectRepository.flush();
 
                 result.put(name, id);
             }
@@ -160,7 +162,7 @@ public class ScheduleService {
                 entity.setName(name);
 
                 Long id = roomRepository.save(entity).getId();
-                roomRepository.flush();
+
 
                 result.put(name, id);
             }
@@ -194,7 +196,6 @@ public class ScheduleService {
                 entity.setName(name);
 
                 Long id = teacherRepository.save(entity).getId();
-                teacherRepository.flush();;
 
                 result.put(name, id);
             }
@@ -218,7 +219,7 @@ public class ScheduleService {
             ScheduleEntity entity = new ScheduleEntity();
 
             entity.setGroupId(groupId);
-            entity.setDayOfWeek(String.valueOf(schedule.getDayOfWeek()));
+            entity.setDayOfWeek(schedule.getDayOfWeek());
             entity.setSubjectId(subjectsMap.get(schedule.getSubject()));
             entity.setRoomId(roomsMap.get(schedule.getRoom()));
             entity.setTeacherId(teachersMap.get(schedule.getTeacher()));
