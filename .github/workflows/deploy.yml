@@ -15,23 +15,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-    build:
-      services:
-        postgres:
-          image: postgres:18
-          env:
-            POSTGRES_DB: mimo_test
-            POSTGRES_USER: mimo_test
-            POSTGRES_PASSWORD: mimo_test
-          ports:
-            - 5432:5432
-          options: >-
-            --health-cmd "pg_isready -U mimo_test -d mimo_test"
-            --health-interval 10s
-            --health-timeout 5s
-            --health-retries 5
-      name: Build and test
-      runs-on: ubuntu-latest
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
 
     services:
       postgres:
@@ -47,8 +33,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
-    steps:
 
     steps:
       - name: Checkout repository
