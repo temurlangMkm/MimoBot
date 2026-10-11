@@ -22,7 +22,7 @@ public class CommandHandler {
 
         return switch (command[0]) {
             case "/get" -> getHandle(message, chatId);
-            case "/set" -> userService.set(chatId);
+            case "/setCommand" -> userService.setCommand(chatId);
             case "/forgetMe" -> userService.deleteUser(chatId);
             case "/me" -> userService.infoAboutUser(chatId);
             default -> "Bunday buyruq mavjud emas.";

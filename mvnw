@@ -29,8 +29,8 @@
 #   MVNW_VERBOSE - true: enable verbose log; debug: trace the mvnw script; others: silence the output
 # ----------------------------------------------------------------------------
 
-set -euf
-[ "${MVNW_VERBOSE-}" != debug ] || set -x
+setCommand -euf
+[ "${MVNW_VERBOSE-}" != debug ] || setCommand -x
 
 # OS specific support.
 native_path() { printf %s\\n "$1"; }
@@ -41,7 +41,7 @@ CYGWIN* | MINGW*)
   ;;
 esac
 
-# set JAVACMD and JAVACCMD
+# setCommand JAVACMD and JAVACCMD
 set_java_home() {
   # For Cygwin and MinGW, ensure paths are in Unix format before anything is touched
   if [ -n "${JAVA_HOME-}" ]; then
@@ -61,12 +61,12 @@ set_java_home() {
     fi
   else
     JAVACMD="$(
-      'set' +e
+      'setCommand' +e
       'unset' -f command 2>/dev/null
       'command' -v java
     )" || :
     JAVACCMD="$(
-      'set' +e
+      'setCommand' +e
       'unset' -f command 2>/dev/null
       'command' -v javac
     )" || :
@@ -269,7 +269,7 @@ fi
 # If not found, search for any directory with the Maven executable (for snapshots)
 if [ -z "$actualDistributionDir" ]; then
   # enable globbing to iterate over items
-  set +f
+  setCommand +f
   for dir in "$TMP_DOWNLOAD_DIR"/*; do
     if [ -d "$dir" ]; then
       if [ -f "$dir/bin/$MVN_CMD" ]; then
@@ -278,7 +278,7 @@ if [ -z "$actualDistributionDir" ]; then
       fi
     fi
   done
-  set -f
+  setCommand -f
 fi
 
 if [ -z "$actualDistributionDir" ]; then

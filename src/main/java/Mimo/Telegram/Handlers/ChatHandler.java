@@ -27,6 +27,12 @@ public class ChatHandler {
             return commandHandler.handle(message, chatId);
         }
 
+        State userState = userService.getState(chatId);
+
+        if(userState != State.NONE) {
+            return stateHandler.handle(message, chatId, userState);
+        }
+
         //TODO: Change this and a separate  RegularWordsHanndler
         switch (message.toLowerCase(Locale.ROOT)) {
             case "dushanba", "monday", "понедельник" -> {
@@ -51,12 +57,6 @@ public class ChatHandler {
                 return userService.getDaySchedule(DayOfWeek.SUNDAY,chatId);
             }
         };
-
-        State userState = userService.getState(chatId);
-
-        if(userState != State.NONE) {
-            return stateHandler.handle(message, chatId, userState);
-        }
 
         return ""; //TODO AI chat if text non command or unplaned
 

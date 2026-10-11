@@ -65,7 +65,7 @@ public class ScheduleService {
         try {
             schedules = parseSchedules(message);
         } catch (JacksonException e) {
-            return "EROR: "+e.getLocalizedMessage();
+            return "ERROR: "+e.getLocalizedMessage();
         }
 
         prepareSchedules(schedules, groupName);

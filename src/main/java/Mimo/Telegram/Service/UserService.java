@@ -103,7 +103,7 @@ public class UserService {
         user.setState(State.NONE);
         userRepo.save(user);
 
-        return text;
+        return getWeeKSchedule(chatId);
     }
 
     @Transactional
@@ -112,7 +112,7 @@ public class UserService {
         return "User "+chatId+" deleted.";
     }
 
-    public String set (Long id){
+    public String setCommand(Long id){
         UserEntity user = userRepo.findByTgId(id);
 
         if(user == null){
