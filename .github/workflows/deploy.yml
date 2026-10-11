@@ -48,6 +48,10 @@ jobs:
           cache: maven
 
       - name: Build and run tests
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/mimo_test
+          SPRING_DATASOURCE_USERNAME: mimo_test
+          SPRING_DATASOURCE_PASSWORD: mimo_test
         run: mvn -B clean verify
 
       - name: Verify executable JAR
