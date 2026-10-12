@@ -3,7 +3,7 @@ package Mimo.Telegram.Repository;
 import Mimo.Telegram.Entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UsersRepository extends JpaRepository<UserEntity, Long> {
+public interface TgUsersRepository extends JpaRepository<UserEntity, Long> {
 
 
     boolean existsByTgId(Long tgId);

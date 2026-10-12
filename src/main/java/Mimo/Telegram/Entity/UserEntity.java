@@ -20,7 +20,7 @@ public class UserEntity {
 
 
     @Column(name = "group_id")
-    private Long groupID;
+    private Long groupId;
 
     @Column(name = "notifications")
     private Boolean notifications;
@@ -41,14 +41,14 @@ public class UserEntity {
     public UserEntity(
             Long id,
             Long tgID,
-            Long groupID,
+            Long groupId,
             Boolean notifications,
             Boolean onlyCommand,
             String language
     ) {
         this.id = id;
         this.tgId = tgID;
-        this.groupID = groupID;
+        this.groupId = groupId;
         this.notifications = notifications;
         this.onlyCommand = onlyCommand;
         this.language = language;

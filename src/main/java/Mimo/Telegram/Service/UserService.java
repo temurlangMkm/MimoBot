@@ -1,14 +1,15 @@
 package Mimo.Telegram.Service;
 
+
 import Mimo.Schedule.DTO.Schedule;
 import Mimo.Schedule.Service.GroupService;
 import Mimo.Schedule.Service.ScheduleService;
+import Mimo.Telegram.Entity.MessageToSend;
 import Mimo.Telegram.Entity.UserEntity;
-import Mimo.Telegram.Language;
-import Mimo.Telegram.Repository.UsersRepository;
+import Mimo.Telegram.Repository.TgUsersRepository;
 import Mimo.Telegram.State;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -16,128 +17,94 @@ import java.util.List;
 @Service
 public class UserService {
 
-    /*TODO Divide the service into:
-        RegistrationService
-        CommandsService
-        FlowService
-        ChatService
-        UserService
-    */
-    private final UsersRepository userRepo;
+    private final TgUsersRepository userRepo;
     private final GroupService  groupService;
     private final ScheduleService scheduleService;
 
-    public UserService(UsersRepository userRepo, GroupService groupService, ScheduleService scheduleService) {
+    public UserService(TgUsersRepository userRepo, GroupService groupService, ScheduleService scheduleService) {
         this.userRepo = userRepo;
         this.groupService = groupService;
         this.scheduleService = scheduleService;
     }
 
-    public String infoAboutUser(Long id){ //TODO add user activities, Points in games (TODO for future: add mini games)
+    public MessageToSend infoAboutUser(@NonNull UserEntity user){
 
-        UserEntity user = userRepo.findByTgId(id);
-
-        if(user == null){
-            return registration(id);
-        }
-
-        return "group: "+ groupService.getNameByID(user.getGroupID())+"\nState: "+user.getState();
+        return new MessageToSend(MessageKey.TEXT, "group: "+ groupService.getNameByID(user.getGroupId())+"\nState: "+user.getState(), user.getId());
 
     }
 
-    public State getState(Long id){
-
-        UserEntity user = userRepo.findByTgId(id);
-
-        if(user == null){
-            return State.UNREGISTERED;
-        }
-
-        return user.getState();
-    }
-
-    @Transactional
-    public String registration(Long chatId){
+    public MessageToSend newTgUser(Long chatId){
 
         UserEntity userToSave = new UserEntity();
         userToSave.setTgId(chatId);
-        userToSave.setGroupID(null);
+        userToSave.setGroupId(null);
         userToSave.setNotifications(false);
         userToSave.setOnlyCommand(true);
         userToSave.setLanguage(String.valueOf(Language.UZ));
         userToSave.setState(State.CHOICE_GROUP);
         userRepo.save(userToSave);
 
-        return "You are new in this bot, please send your group.";
+        return new MessageToSend(MessageKey.WELCOME, "", chatId);
 
     }
 
-    public String saveGroup(Long id, String text){
+    public MessageToSend choiceGroup(@NonNull UserEntity user){
+        user.setState(State.CHOICE_GROUP);
+        userRepo.save(user);
+        return new MessageToSend(MessageKey.CHOOSE_GROUP, "",  user.getId());
+    }
 
-        Long groupId = groupService.saveGroup(text);
+    public MessageToSend saveGroup(UserEntity user, String groupName){
 
-        if(groupId>0){
-            UserEntity user = userRepo.findByTgId(id);
-            user.setState(State.NONE);
-            user.setGroupID(groupId);
-            userRepo.save(user);
-            return "Group Saved";
+        Long groupId = groupService.saveGroup(groupName);
+
+        if(groupId<0){
+            return new MessageToSend(MessageKey.BAD_GROUP_NAME, "", user.getId());
         }else{
-            return "Invalid group name. Try again";
+            user.setState(State.NONE);
+            user.setGroupId(groupId);
+            userRepo.save(user);
+            return new MessageToSend(MessageKey.GROUP_SELECTED, "", user.getId());
         }
     }
 
-    public String setSchedule(String message, Long chatId) {
+    public MessageToSend setSchedule(String message, @NonNull UserEntity user) {
 
-        UserEntity user = userRepo.findByTgId(chatId);
-
-        String groupName = groupService.getNameById(user.getGroupID());
+        String groupName = groupService.getNameById(user.getGroupId());
 
         String text =  scheduleService.setSchedule(message, groupName);
 
         if(text.startsWith("ERROR")){
-            System.out.println(text); //TODO add logger
-            return "invalid JSON";
+            System.out.println(text);
+            return new MessageToSend(MessageKey.BAD_JSON, "", user.getId());
         }
 
         user.setState(State.NONE);
         userRepo.save(user);
 
-        return getWeeKSchedule(chatId);
+        return getWeeKSchedule(user);
     }
 
-    @Transactional
-    public String deleteUser(Long chatId) {
-        userRepo.deleteByTgId(chatId);
-        return "User "+chatId+" deleted.";
-    }
-
-    public String setCommand(Long id){
-        UserEntity user = userRepo.findByTgId(id);
-
-        if(user == null){
-            return registration(id);
-        }
+    public MessageToSend setSchedule(@NonNull UserEntity user){
 
         user.setState(State.SEND_SCHEDULE);
         userRepo.save(user);
-        return "Send Your Schedule in format JSON";
+        return new MessageToSend(MessageKey.SEND_SCHEDULE, "", user.getId());
     }
 
-    public String getWeeKSchedule(Long id) {
+    public MessageToSend getWeeKSchedule(@NonNull UserEntity user) {
 
-        UserEntity user = userRepo.findByTgId(id);
+        Long groupId = user.getGroupId();
 
-        if(user == null || user.getGroupID()==null){
-            return registration(id);
+        if(groupId == null || groupId < 0){
+            return choiceGroup(user);
         }
 
-        Long groupId = user.getGroupID();
         List<Schedule> scheduleList =
                 scheduleService.getScheduleForWeek(groupId);
 
         if (scheduleList.isEmpty()) {
-            return "На этой неделе занятий нет.";
+            return new MessageToSend(MessageKey.SCHEDULE_NOT_FOUND, "", user.getId());
         }
 
         StringBuilder text = new StringBuilder();
@@ -168,24 +135,23 @@ public class UserService {
                     .append("\n\n");
         }
 
-        return text.toString().trim();
+        return new MessageToSend(MessageKey.SCHEDULE_FOR_WEEK, text.toString().trim() , user.getId());
     }
 
-    public String getDaySchedule(DayOfWeek dayOfWeek, Long id) {
+    public  MessageToSend getDaySchedule(DayOfWeek dayOfWeek, @NonNull UserEntity user) {
 
-        UserEntity user = userRepo.findByTgId(id);
 
-        if(user == null || user.getGroupID()==null){
-            return registration(id);
+        Long groupId = user.getGroupId();
+
+        if(groupId == null || groupId < 0){
+            return choiceGroup(user);
         }
-
-        Long groupId = user.getGroupID();
 
         List<Schedule> scheduleList =
                 scheduleService.getScheduleForDay(groupId, dayOfWeek);
 
         if (scheduleList.isEmpty()) {
-            return "На этот день занятий нет.";
+            return new MessageToSend(MessageKey.SCHEDULE_NOT_FOUND, "", user.getId());
         }
 
         StringBuilder text = new StringBuilder();
@@ -210,18 +176,20 @@ public class UserService {
                     .append("\n\n");
         }
 
-        return text.toString().trim();
+        return new MessageToSend(MessageKey.SCHEDULE_FOR_DAY, text.toString().trim() , user.getId());
     }
 
     private String getDayName(DayOfWeek dayOfWeek) {
         return switch (dayOfWeek) {
-            case MONDAY -> "Понедельник";
-            case TUESDAY -> "Вторник";
-            case WEDNESDAY -> "Среда";
-            case THURSDAY -> "Четверг";
-            case FRIDAY -> "Пятница";
-            case SATURDAY -> "Суббота";
-            case SUNDAY -> "Воскресенье";
+            case MONDAY -> "{MONDAY}";
+            case TUESDAY -> "{TUESDAY}";
+            case WEDNESDAY -> "{WEDNESDAY}";
+            case THURSDAY -> "{THURSDAY}";
+            case FRIDAY -> "{FRIDAY }";
+            case SATURDAY -> "{SATURDAY}";
+            case SUNDAY -> "{SUNDAY}";
         };
     }
+
 }
+

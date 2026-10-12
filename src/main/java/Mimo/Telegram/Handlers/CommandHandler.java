@@ -1,6 +1,6 @@
 package Mimo.Telegram.Handlers;
 
-import Mimo.Telegram.Service.UserService;
+import Mimo.Telegram.Service.OldUserService;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
@@ -8,10 +8,10 @@ import java.time.DayOfWeek;
 @Component
 public class CommandHandler {
 
-    private final UserService userService;
+    private final OldUserService oldUserService;
 
-    public CommandHandler( UserService userService) {
-        this.userService = userService;
+    public CommandHandler( OldUserService oldUserService) {
+        this.oldUserService = oldUserService;
     }
 
 
@@ -22,9 +22,9 @@ public class CommandHandler {
 
         return switch (command[0]) {
             case "/get" -> getHandle(message, chatId);
-            case "/setCommand" -> userService.setCommand(chatId);
-            case "/forgetMe" -> userService.deleteUser(chatId);
-            case "/me" -> userService.infoAboutUser(chatId);
+            case "/setCommand" -> oldUserService.setCommand(chatId);
+            case "/forgetMe" -> oldUserService.deleteUser(chatId);
+            case "/me" -> oldUserService.infoAboutUser(chatId);
             default -> "Bunday buyruq mavjud emas.";
         };
     }
@@ -34,19 +34,19 @@ public class CommandHandler {
         String[] command = message.split(" ");
 
         if(command.length == 1) {
-            return userService
+            return oldUserService
                     .getWeeKSchedule(chatId);
         }
 
 
         return switch (command[1].toLowerCase()) {
-            case "dushanba", "monday", "понедельник" -> userService.getDaySchedule(DayOfWeek.MONDAY,chatId);
-            case "seshanba", "tuesday", "вторник" -> userService.getDaySchedule(DayOfWeek.TUESDAY,chatId);
-            case "chorshanba", "wednesday", "среда" -> userService.getDaySchedule(DayOfWeek.WEDNESDAY,chatId);
-            case "payshanba", "thursday", "четверг" -> userService.getDaySchedule(DayOfWeek.THURSDAY,chatId);
-            case "juma", "friday", "пятница" -> userService.getDaySchedule(DayOfWeek.FRIDAY,chatId);
-            case "shanba", "saturday", "суббота" -> userService.getDaySchedule(DayOfWeek.SATURDAY,chatId);
-            case "yakshhanba", "sunday", "воскресения" -> userService.getDaySchedule(DayOfWeek.SUNDAY,chatId);
+            case "dushanba", "monday", "понедельник" -> oldUserService.getDaySchedule(DayOfWeek.MONDAY,chatId);
+            case "seshanba", "tuesday", "вторник" -> oldUserService.getDaySchedule(DayOfWeek.TUESDAY,chatId);
+            case "chorshanba", "wednesday", "среда" -> oldUserService.getDaySchedule(DayOfWeek.WEDNESDAY,chatId);
+            case "payshanba", "thursday", "четверг" -> oldUserService.getDaySchedule(DayOfWeek.THURSDAY,chatId);
+            case "juma", "friday", "пятница" -> oldUserService.getDaySchedule(DayOfWeek.FRIDAY,chatId);
+            case "shanba", "saturday", "суббота" -> oldUserService.getDaySchedule(DayOfWeek.SATURDAY,chatId);
+            case "yakshhanba", "sunday", "воскресения" -> oldUserService.getDaySchedule(DayOfWeek.SUNDAY,chatId);
             default -> "Bunday buyruq mavjud emas.";
         };
     }

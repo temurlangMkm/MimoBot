@@ -1,6 +1,6 @@
 package Mimo.Telegram.Handlers;
 
-import Mimo.Telegram.Service.UserService;
+import Mimo.Telegram.Service.OldUserService;
 import Mimo.Telegram.State;
 import org.springframework.stereotype.Service;
 
@@ -12,12 +12,12 @@ public class ChatHandler {
 
     private final CommandHandler commandHandler;
     private final StateHandler stateHandler;
-    private final UserService userService;
+    private final OldUserService oldUserService;
 
-    public ChatHandler(CommandHandler commandHandler, StateHandler stateHandler, UserService userService){
+    public ChatHandler(CommandHandler commandHandler, StateHandler stateHandler, OldUserService oldUserService){
         this.commandHandler = commandHandler;
         this.stateHandler = stateHandler;
-        this.userService = userService;
+        this.oldUserService = oldUserService;
     }
 
     //TODO Eliminate several database queries for looking up users.
@@ -27,7 +27,7 @@ public class ChatHandler {
             return commandHandler.handle(message, chatId);
         }
 
-        State userState = userService.getState(chatId);
+        State userState = oldUserService.getState(chatId);
 
         if(userState != State.NONE) {
             return stateHandler.handle(message, chatId, userState);
@@ -36,25 +36,25 @@ public class ChatHandler {
         //TODO: Change this and a separate  RegularWordsHanndler
         switch (message.toLowerCase(Locale.ROOT)) {
             case "dushanba", "monday", "понедельник" -> {
-                return userService.getDaySchedule(DayOfWeek.MONDAY,chatId);
+                return oldUserService.getDaySchedule(DayOfWeek.MONDAY,chatId);
             }
             case "seshanba", "tuesday", "вторник" -> {
-                return userService.getDaySchedule(DayOfWeek.TUESDAY,chatId);
+                return oldUserService.getDaySchedule(DayOfWeek.TUESDAY,chatId);
             }
             case "chorshanba", "wednesday", "среда" -> {
-                return userService.getDaySchedule(DayOfWeek.WEDNESDAY,chatId);
+                return oldUserService.getDaySchedule(DayOfWeek.WEDNESDAY,chatId);
             }
             case "payshanba", "thursday", "четверг" -> {
-                return userService.getDaySchedule(DayOfWeek.THURSDAY,chatId);
+                return oldUserService.getDaySchedule(DayOfWeek.THURSDAY,chatId);
             }
             case "juma", "friday", "пятница" -> {
-                return userService.getDaySchedule(DayOfWeek.FRIDAY,chatId);
+                return oldUserService.getDaySchedule(DayOfWeek.FRIDAY,chatId);
             }
             case "shanba", "saturday", "суббота" -> {
-                return userService.getDaySchedule(DayOfWeek.SATURDAY,chatId);
+                return oldUserService.getDaySchedule(DayOfWeek.SATURDAY,chatId);
             }
             case "yakshhanba", "sunday", "воскресения" -> {
-                return userService.getDaySchedule(DayOfWeek.SUNDAY,chatId);
+                return oldUserService.getDaySchedule(DayOfWeek.SUNDAY,chatId);
             }
         };
 

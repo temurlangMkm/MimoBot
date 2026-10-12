@@ -1,4 +1,4 @@
-package Mimo.Telegram;
+package Mimo.Telegram.Service;
 
 public enum Language {
     UZ,
