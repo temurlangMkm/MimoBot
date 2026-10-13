@@ -1,39 +1,35 @@
 package Mimo.Telegram.Service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 
 @Service
+@RequiredArgsConstructor
 public class MessageService {
 
-    private final Map<MessageKey, String> toRussian = new HashMap<>();
-    private final Map<MessageKey, String> toUzbek = new HashMap<>();
+    private final MessageSource messageSource;
 
-    public MessageService() {
-        // Russian
-        toRussian.put(MessageKey.WELCOME,
-                "Привет! Вы раньше не регистрировались в нашем сервисе. " +
-                        "Пожалуйста, выберите группу для начала.");
-        toRussian.put(MessageKey.CHOOSE_GROUP,
-                "Отправьте группу.");
-
-        // Uzbek
-        toUzbek.put(MessageKey.WELCOME,
-                "Salom! Siz avval xizmatimizda ro'yxatdan o'tmagansiz. " +
-                        "Boshlash uchun guruhingizni tanlang.");
-        toUzbek.put(MessageKey.CHOOSE_GROUP,
-                "Guruhingizni yuboring.");
+    // Метод для обычных сообщений
+    public String getMessage(MessageKey key, Language language) {
+        return getMessage(key, language, (Object[]) null);
     }
 
-    public String getMessage(MessageKey key, Enum language) {
-        Map<MessageKey, String> messages = switch (language) {
-            case Language.RU -> toRussian;
-            case Language.UZ -> toUzbek;
-            default -> toUzbek;
-        };
+    // Перегруженный метод для сообщений с параметрами (например: "Привет, {0}!")
+    public String getMessage(MessageKey key, Language language, Object... args) {
+        Locale locale = getLocale(language);
+        // Spring ищет ключ по названию enum'а в нижнем регистре
+        return messageSource.getMessage(key.name().toLowerCase(), args, locale);
+    }
 
-        return messages.getOrDefault(key, key.name());
+    private Locale getLocale(Language language) {
+        return switch (language) {
+            case RU -> new Locale("ru");
+            case EN -> new Locale("en");
+            case UZ -> new Locale("uz");
+            default -> new Locale("uz");
+        };
     }
 }

@@ -1,26 +1,18 @@
 package Mimo.Telegram.Entity;
 
 import Mimo.Telegram.Service.MessageKey;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashMap;
 
 @Getter
-@Setter
+@Builder
 public class MessageToSend {
 
+    private final MessageKey messageKey;
+    private final String text;
+    private final Long id;
 
-    public MessageKey messageKey;
-    public String text;
-    public Long id;
-
-
-
-    public MessageToSend(MessageKey messageKey,String text, Long id) {
-        this.text = text;
-        this.messageKey = messageKey;
-        this.id = id;
-    }
-    public MessageToSend() {}
 }
