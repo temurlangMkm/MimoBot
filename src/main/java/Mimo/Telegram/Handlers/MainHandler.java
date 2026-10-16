@@ -1,5 +1,9 @@
 package Mimo.Telegram.Handlers;
 
+import Mimo.Telegram.Entity.ChatEntity;
+import Mimo.Telegram.Entity.UserEntity;
+import Mimo.Telegram.Repository.TgChatsRepository;
+import Mimo.Telegram.Repository.TgUsersRepository;
 import Mimo.Telegram.Service.OldUserService;
 import Mimo.Telegram.State;
 import org.springframework.stereotype.Service;
@@ -8,19 +12,24 @@ import java.time.DayOfWeek;
 import java.util.Locale;
 
 @Service
-public class ChatHandler {
+public class MainHandler {
 
     private final CommandHandler commandHandler;
     private final StateHandler stateHandler;
     private final OldUserService oldUserService;
 
-    public ChatHandler(CommandHandler commandHandler, StateHandler stateHandler, OldUserService oldUserService){
+    private final TgUsersRepository tgUsersRepository;
+    private final TgChatsRepository tgChatsRepository;
+
+    public MainHandler(CommandHandler commandHandler, StateHandler stateHandler, OldUserService oldUserService, TgUsersRepository tgUsersRepository, TgChatsRepository tgChatsRepository){
         this.commandHandler = commandHandler;
         this.stateHandler = stateHandler;
         this.oldUserService = oldUserService;
+        this.tgUsersRepository = tgUsersRepository;
+        this.tgChatsRepository = tgChatsRepository;
     }
 
-    //TODO Eliminate several database queries for looking up users.
+
     public String handle (String message, Long chatId){
 
         if (message.startsWith("/")) {
@@ -58,7 +67,8 @@ public class ChatHandler {
             }
         };
 
-        return ""; //TODO AI chat if text non command or unplaned
+        return "";
+
 
 
     }

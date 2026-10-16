@@ -1,5 +1,6 @@
 package Mimo.Telegram.Entity;
 
+import Mimo.Telegram.Service.Language;
 import Mimo.Telegram.State;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -29,7 +30,7 @@ public class UserEntity {
     private Boolean onlyCommand;
 
     @Column(name = "language", nullable = false)
-    private String language;
+    private Language language;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
@@ -44,7 +45,7 @@ public class UserEntity {
             Long groupId,
             Boolean notifications,
             Boolean onlyCommand,
-            String language
+            Language language
     ) {
         this.id = id;
         this.tgId = tgID;

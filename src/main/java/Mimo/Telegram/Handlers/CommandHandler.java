@@ -21,7 +21,7 @@ public class CommandHandler {
         String[] command = message.split("\\s+");
 
         return switch (command[0]) {
-            case "/get" -> getHandle(message, chatId);
+            case "/get" -> getDayHandle(message, chatId);
             case "/setCommand" -> oldUserService.setCommand(chatId);
             case "/forgetMe" -> oldUserService.deleteUser(chatId);
             case "/me" -> oldUserService.infoAboutUser(chatId);
@@ -29,7 +29,7 @@ public class CommandHandler {
         };
     }
 
-    public String getHandle(String message, Long chatId){
+    public String getDayHandle(String message, Long chatId){
 
         String[] command = message.split(" ");
 

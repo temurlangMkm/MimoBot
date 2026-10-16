@@ -1,12 +1,15 @@
 package Mimo.Telegram.Service;
 
 import Mimo.Schedule.DTO.Schedule;
+import Mimo.Telegram.Entity.UserEntity;
 import org.springframework.stereotype.Component;
 import java.time.DayOfWeek;
 import java.util.List;
 
 @Component
 public class ScheduleFormatter {
+
+    MessageService messageService;
 
     public String formatWeek(List<Schedule> scheduleList) {
         StringBuilder text = new StringBuilder();
@@ -39,6 +42,6 @@ public class ScheduleFormatter {
     }
 
     private String getDayName(DayOfWeek dayOfWeek) {
-        return "{" + dayOfWeek.name() + "}";
+        return "{"+dayOfWeek.name()+"}";
     }
 }

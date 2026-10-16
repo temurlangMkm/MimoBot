@@ -1,7 +1,7 @@
 package Mimo.Telegram;
 
 
-import Mimo.Telegram.Handlers.ChatHandler;
+import Mimo.Telegram.Handlers.MainHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -14,13 +14,13 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class MyTelegramBot extends TelegramLongPollingBot {
 
     private final String botUsername;
-    private final ChatHandler chatHandler;
+    private final MainHandler mainHandler;
 
     public MyTelegramBot(@Value("${bot.token}") String botToken,
-                         @Value("${bot.name}") String botUsername, ChatHandler chatHandler) {
+                         @Value("${bot.name}") String botUsername, MainHandler mainHandler) {
         super(botToken);
         this.botUsername = botUsername;
-        this.chatHandler = chatHandler;
+        this.mainHandler = mainHandler;
     }
 
 
@@ -42,7 +42,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
 
-            String sendMessage = chatHandler.handle(messageText, chatId);
+            String sendMessage = mainHandler.handle(messageText, chatId);
 
             if(!sendMessage.isBlank()){
                 SendMessage(chatId, sendMessage);
