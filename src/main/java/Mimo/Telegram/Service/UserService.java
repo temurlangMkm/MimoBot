@@ -7,6 +7,7 @@ import Mimo.Telegram.Entity.UserEntity;
 import Mimo.Telegram.Language;
 import Mimo.Telegram.Repository.UsersRepository;
 import Mimo.Telegram.State;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,13 +17,6 @@ import java.util.List;
 @Service
 public class UserService {
 
-    /*TODO Divide the service into:
-        RegistrationService
-        CommandsService
-        FlowService
-        ChatService
-        UserService
-    */
     private final UsersRepository userRepo;
     private final GroupService  groupService;
     private final ScheduleService scheduleService;
@@ -33,7 +27,7 @@ public class UserService {
         this.scheduleService = scheduleService;
     }
 
-    public String infoAboutUser(Long id){ //TODO add user activities, Points in games (TODO for future: add mini games)
+    public String infoAboutUser(Long id){
 
         UserEntity user = userRepo.findByTgId(id);
 
@@ -64,7 +58,7 @@ public class UserService {
         userToSave.setGroupID(null);
         userToSave.setNotifications(false);
         userToSave.setOnlyCommand(true);
-        userToSave.setLanguage(String.valueOf(Language.UZ));
+        userToSave.setLanguage(Language.UZ);
         userToSave.setState(State.CHOICE_GROUP);
         userRepo.save(userToSave);
 
@@ -150,7 +144,7 @@ public class UserService {
                 currentDay = schedule.getDayOfWeek();
 
                 text.append("📅")
-                        .append(getDayName(currentDay))
+                        .append(getDayName(currentDay, user.getLanguage()))
                         .append("\n\n");
             }
 
@@ -191,7 +185,7 @@ public class UserService {
         StringBuilder text = new StringBuilder();
 
         text.append("📅")
-                .append(getDayName(dayOfWeek))
+                .append(getDayName(dayOfWeek, user.getLanguage()))
                 .append("\n\n");
 
         for (Schedule schedule : scheduleList) {
@@ -213,15 +207,35 @@ public class UserService {
         return text.toString().trim();
     }
 
-    private String getDayName(DayOfWeek dayOfWeek) {
-        return switch (dayOfWeek) {
-            case MONDAY -> "Понедельник";
-            case TUESDAY -> "Вторник";
-            case WEDNESDAY -> "Среда";
-            case THURSDAY -> "Четверг";
-            case FRIDAY -> "Пятница";
-            case SATURDAY -> "Суббота";
-            case SUNDAY -> "Воскресенье";
-        };
+    private @NonNull String getDayName(DayOfWeek dayOfWeek, Language lan) {
+        String dayName;
+        if(lan.equals(Language.RU)){
+            dayName = switch (dayOfWeek) {
+                case MONDAY -> "Понедельник";
+                case TUESDAY -> "Вторник";
+                case WEDNESDAY -> "Среда";
+                case THURSDAY -> "Четверг";
+                case FRIDAY -> "Пятница";
+                case SATURDAY -> "Суббота";
+                case SUNDAY -> "Воскресенье";
+            };
+            return dayName;
+        }
+
+        if(lan.equals(Language.UZ)){
+            dayName = switch (dayOfWeek) {
+                case MONDAY -> "Dushanba";
+                case TUESDAY -> "Seshanba";
+                case WEDNESDAY -> "Chorshanba";
+                case THURSDAY -> "Payshanba";
+                case FRIDAY -> "Juma";
+                case SATURDAY -> "Shanba";
+                case SUNDAY -> "Yakshanba";
+            };
+            return dayName;
+        }
+
+        return dayOfWeek.name();
+
     }
 }
