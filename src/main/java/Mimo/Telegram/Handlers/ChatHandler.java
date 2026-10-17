@@ -30,39 +30,38 @@ public class ChatHandler {
             return commandHandler.handle(message, chatId);
         }
 
+        State  state;
         if(chatId>0){
-            State state = userService.getState(chatId);
+            state = userService.getState(chatId);
+        }else{
+            state = chatService.getState(chatId);
         }
-        State state = chatService.getState(chatId);
+
 
 
         if(state != State.NONE) {
             return stateHandler.handle(message, chatId, state);
         }
 
-        switch (message.toLowerCase(Locale.ROOT)) {
-            case "dushanba", "monday", "понедельник" -> {
-               return chatId > 0 ? userService.getDaySchedule(DayOfWeek.MONDAY,chatId) : chatService.getDaySchedule(DayOfWeek.MONDAY,chatId) ;
-            }
-            case "seshanba", "tuesday", "вторник" -> {
-                return chatId > 0 ? userService.getDaySchedule(DayOfWeek.TUESDAY,chatId) : chatService.getDaySchedule(DayOfWeek.TUESDAY,chatId);
-            }
-            case "chorshanba", "wednesday", "среда" -> {
-                return chatId > 0 ? userService.getDaySchedule(DayOfWeek.WEDNESDAY,chatId) : chatService.getDaySchedule(DayOfWeek.WEDNESDAY,chatId);
-            }
-            case "payshanba", "thursday", "четверг" -> {
-                return chatId > 0 ? userService.getDaySchedule(DayOfWeek.THURSDAY,chatId) : chatService.getDaySchedule(DayOfWeek.THURSDAY,chatId);
-            }
-            case "juma", "friday", "пятница" -> {
-                return chatId > 0 ? userService.getDaySchedule(DayOfWeek.FRIDAY,chatId) : chatService.getDaySchedule(DayOfWeek.FRIDAY,chatId);
-            }
-            case "shanba", "saturday", "суббота" -> {
-                return chatId > 0 ? userService.getDaySchedule(DayOfWeek.SATURDAY,chatId) : chatService.getDaySchedule(DayOfWeek.SATURDAY,chatId);
-            }
-            case "yakshhanba", "sunday", "воскресения" -> {
-                return chatId > 0 ?  userService.getDaySchedule(DayOfWeek.SUNDAY,chatId) : chatService.getDaySchedule(DayOfWeek.SUNDAY,chatId);
-            }
-        };
+        if(message.split(" ").length < 2) {
+            return switch (message.toLowerCase(Locale.ROOT)) {
+                case "dushanba", "monday", "понедельник" ->
+                        chatId > 0 ? userService.getDaySchedule(DayOfWeek.MONDAY, chatId) : chatService.getDaySchedule(DayOfWeek.MONDAY, chatId);
+                case "seshanba", "tuesday", "вторник" ->
+                        chatId > 0 ? userService.getDaySchedule(DayOfWeek.TUESDAY, chatId) : chatService.getDaySchedule(DayOfWeek.TUESDAY, chatId);
+                case "chorshanba", "wednesday", "среда" ->
+                        chatId > 0 ? userService.getDaySchedule(DayOfWeek.WEDNESDAY, chatId) : chatService.getDaySchedule(DayOfWeek.WEDNESDAY, chatId);
+                case "payshanba", "thursday", "четверг" ->
+                        chatId > 0 ? userService.getDaySchedule(DayOfWeek.THURSDAY, chatId) : chatService.getDaySchedule(DayOfWeek.THURSDAY, chatId);
+                case "juma", "friday", "пятница" ->
+                        chatId > 0 ? userService.getDaySchedule(DayOfWeek.FRIDAY, chatId) : chatService.getDaySchedule(DayOfWeek.FRIDAY, chatId);
+                case "shanba", "saturday", "суббота" ->
+                        chatId > 0 ? userService.getDaySchedule(DayOfWeek.SATURDAY, chatId) : chatService.getDaySchedule(DayOfWeek.SATURDAY, chatId);
+                case "yakshhanba", "sunday", "воскресения" ->
+                        chatId > 0 ? userService.getDaySchedule(DayOfWeek.SUNDAY, chatId) : chatService.getDaySchedule(DayOfWeek.SUNDAY, chatId);
+                default -> "";
+            };
+        }
 
         return "";
 
